@@ -13,3 +13,7 @@
 - [x] `perf_event`事件
 - [x] `lsm`事件
 - [x] `lsm_eperm`事件
+- [x] `send_signa`事件
+- [x] `constant_edttor`事件
+- [x] `map_rewrtie`事件
+- [x] `map in map`事件
