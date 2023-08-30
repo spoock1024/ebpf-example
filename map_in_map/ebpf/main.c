@@ -24,18 +24,18 @@ int kprobe_vfs_mkdir(void *ctx)
         u32 value = 42;
         u32 newKey = 3;
         u32 newValue = 3;
-        void *outer_map = bpf_map_lookup_elem(&OuterM, &key);
-        if (outer_map == NULL) {
+        void *inner_map = bpf_map_lookup_elem(&OuterM, &key);
+        if (inner_map == NULL) {
                 bpf_printk("map lookup failed\n");
             return 0;
         }
 
         bpf_printk("map rewrite,mkdir (vfs hook point)\n");
-        int result = bpf_map_update_elem(outer_map, &newKey, &newValue, BPF_ANY);
+        int result = bpf_map_update_elem(inner_map, &newKey, &newValue, BPF_ANY);
         if (result == 0) {
             bpf_printk("add new key-value pair\n");
         }
-        result = bpf_map_update_elem(outer_map, &key, &value, BPF_ANY);
+        result = bpf_map_update_elem(inner_map, &key, &value, BPF_ANY);
         if (result == 0) {
             bpf_printk("rewrite key-value pair\n");
         }
