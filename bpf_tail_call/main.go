@@ -9,6 +9,8 @@ import (
 	"log"
 	"os"
 	"os/signal"
+	"syscall"
+	"time"
 )
 
 //go:embed ebpf/bin/probe.o
@@ -64,10 +66,18 @@ func main() {
 
 	log.Println("eBPF program successfully attached. Press CTRL+C to stop.")
 
-	// Wait for the user to press CTRL+C
+	// Wait for an interrupt or a timeout
 	sig := make(chan os.Signal, 1)
-	signal.Notify(sig, os.Interrupt)
-	<-sig
+	signal.Notify(sig, syscall.SIGINT, syscall.SIGTERM)
 
-	log.Println("Detaching program and closing link")
+	select {
+	case <-sig:
+		// Interrupt signal received, close the collection
+		coll.Close()
+		log.Println("Detaching program and closing link")
+	case <-time.After(10 * time.Minute):
+		// Timeout after 10 minutes, close the collection
+		coll.Close()
+	}
+
 }
