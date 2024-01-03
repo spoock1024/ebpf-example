@@ -3,6 +3,9 @@
 #include "bpf_helpers.h"
 #include "bpf_tracing.h"
 #include "bpf_core_read.h"
+#include "bpf_endian.h"
+
+#define ETH_P_IP 0x0800 // IP 数据包的以太网类型
 
 struct {
     __uint(type, BPF_MAP_TYPE_PROG_ARRAY);
@@ -47,7 +50,7 @@ int packet_classifier(struct xdp_md *ctx)  {
     }
 
     // 确保这是一个IP包
-    if (eth->h_proto != 8) {
+    if (eth->h_proto != bpf_htons(ETH_P_IP)) {
         return XDP_PASS;
     }
 
